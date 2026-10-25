@@ -1,0 +1,22 @@
+options {
+    directory "/var/cache/bind";
+    key-directory "/var/lib/bind/claves";     // aqui BIND guarda las claves DNSSEC que genera
+    listen-on    { any; };
+    listen-on-v6 { none; };
+    recursion no;                             // un autoritativo no resuelve para nadie
+    allow-transfer { none; };                 // cada zona abre la transferencia solo con la clave TSIG
+    dnssec-validation no;
+    version "no disponible";
+    minimal-responses yes;
+};
+dnssec-policy "nazareno" {
+    keys { csk key-directory lifetime unlimited algorithm ecdsap256sha256; };
+    nsec3param iterations 0 optout no salt-length 0;   // RFC 9276
+    signatures-validity 14d;
+    signatures-refresh 5d;
+    max-zone-ttl 1d;
+};
+logging {
+    channel consultas { file "/var/log/named/consultas.log" versions 3 size 10m; print-time yes; print-category yes; };
+    category queries { consultas; };
+};

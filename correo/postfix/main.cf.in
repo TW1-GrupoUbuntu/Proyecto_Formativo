@@ -1,0 +1,51 @@
+# Postfix de __DOM__ (Actividad 4). Plantilla: scripts/instalar_correo.sh reemplaza __DOM__ y la copia a /etc/postfix/main.cf
+compatibility_level = 3.6
+myhostname = mail.__DOM__
+mydomain = __DOM__
+myorigin = $mydomain
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+# Relé cerrado: solo el propio servidor es "de confianza"; los demás deben autenticarse por el 587
+mynetworks = 127.0.0.0/8
+inet_interfaces = all
+inet_protocols = ipv4
+smtpd_banner = $myhostname ESMTP
+disable_vrfy_command = yes
+smtpd_helo_required = yes
+biff = no
+append_dot_mydomain = no
+alias_maps = hash:/etc/aliases
+alias_database = hash:/etc/aliases
+recipient_delimiter = +
+
+# Entrega al buzón: Dovecot por LMTP (aplica Sieve: el spam va a Junk)
+mailbox_transport = lmtp:unix:private/dovecot-lmtp
+
+# TLS: certificado de la CA del laboratorio; cifrado oportunista en el 25, obligatorio en el 587
+smtpd_tls_cert_file = /etc/ssl/correo/cert.pem
+smtpd_tls_key_file = /etc/ssl/correo/key.pem
+smtpd_tls_CAfile = /etc/ssl/correo/ca.crt
+smtpd_tls_security_level = may
+smtpd_tls_protocols = >=TLSv1.2
+smtpd_tls_mandatory_protocols = >=TLSv1.2
+smtpd_tls_received_header = yes
+smtpd_tls_loglevel = 1
+smtp_tls_CAfile = /etc/ssl/correo/ca.crt
+smtp_tls_security_level = may
+smtp_tls_protocols = >=TLSv1.2
+smtp_tls_loglevel = 1
+
+# SASL contra Dovecot (solo se ofrece en el 587)
+smtpd_sasl_type = dovecot
+smtpd_sasl_path = private/auth
+smtpd_sasl_security_options = noanonymous
+
+smtpd_relay_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination
+smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination, reject_non_fqdn_recipient, reject_unknown_recipient_domain, check_policy_service unix:private/policyd-spf
+policyd-spf_time_limit = 3600
+
+# Firmas y filtros (milters): OpenDKIM firma/verifica, OpenDMARC evalua la politica, Rspamd puntua el spam (__ANTISPAM__)
+milter_protocol = 6
+milter_default_action = accept
+milter_mail_macros = i {mail_addr} {client_addr} {client_name} {auth_authen} {auth_type}
+smtpd_milters = __MILTERS__
+non_smtpd_milters = inet:127.0.0.1:8891

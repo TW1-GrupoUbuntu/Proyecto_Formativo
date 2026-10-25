@@ -1,0 +1,71 @@
+# Red base del Proyecto Formativo: infraestructura de la Cooperativa Jesús Nazareno en el laboratorio.
+#   bash scripts/levantar.sh          # construye, instala todos los roles y verifica
+x-nodo: &nodo
+  build: .
+  image: nazareno-infra:24.04
+  privileged: true            # necesario para que systemd funcione dentro del contenedor
+  cgroup: host                # requiere cgroup v2
+  tmpfs: [/run, /run/lock, /tmp]
+  volumes: [".:/lab:ro", "./compartido:/compartido"]   # repositorio en /lab (solo lectura); /compartido: CA, claves y DKIM
+  dns: [10.20.0.4]            # todos resuelven con el resolutor de la cooperativa
+
+services:
+  ns1:
+    <<: *nodo
+    container_name: pf-ns1
+    hostname: ns1
+    networks:
+      interna: {ipv4_address: 10.20.0.2}
+      internet: {ipv4_address: 172.31.0.2}
+  ns2:
+    <<: *nodo
+    container_name: pf-ns2
+    hostname: ns2
+    networks:
+      interna: {ipv4_address: 10.20.0.3}
+  resolutor:
+    <<: *nodo
+    container_name: pf-resolutor
+    hostname: resolutor
+    dns: [1.1.1.1]
+    networks:
+      interna: {ipv4_address: 10.20.0.4}
+  web:
+    <<: *nodo
+    container_name: pf-web
+    hostname: web
+    networks:
+      interna: {ipv4_address: 10.20.0.20}
+  mail:
+    <<: *nodo
+    container_name: pf-mail
+    hostname: mail
+    networks:
+      interna: {ipv4_address: 10.20.0.25}
+  mail2:
+    <<: *nodo
+    container_name: pf-mail2
+    hostname: mail2
+    networks:
+      interna: {ipv4_address: 10.20.0.26}
+  cliente:
+    <<: *nodo
+    container_name: pf-cliente
+    hostname: cliente
+    networks:
+      interna: {ipv4_address: 10.20.0.50}
+  externo:
+    <<: *nodo
+    container_name: pf-externo
+    hostname: externo
+    dns: [1.1.1.1]
+    networks:
+      internet: {ipv4_address: 172.31.0.100}
+
+networks:
+  interna:
+    ipam:
+      config: [{subnet: 10.20.0.0/24, gateway: 10.20.0.1}]
+  internet:
+    ipam:
+      config: [{subnet: 172.31.0.0/24, gateway: 172.31.0.1}]

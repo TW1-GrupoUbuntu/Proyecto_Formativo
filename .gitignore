@@ -1,0 +1,16 @@
+informe/
+compartido/
+evidencias/
+resultados/
+*.pdf
+*.docx
+*.pptx
+*.pcap
+*.key
+*.private
+*.log
+dnscontrol/zonas/*.zone
+__pycache__/
+.vscode/
+.DS_Store
+Thumbs.db

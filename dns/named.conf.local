@@ -1,0 +1,42 @@
+acl "red-cooperativa" { 10.20.0.0/24; 127.0.0.0/8; };
+
+// Vista INTERNA: la red de la cooperativa ve los nombres internos y las IP privadas
+view "interna" {
+    match-clients { "red-cooperativa"; };   // el orden importa: la primera vista que coincide responde
+    zone "nazareno.internal" {
+        type primary; file "/var/lib/bind/interna/db.nazareno.internal";
+        allow-transfer { key "transferencia-nazareno"; };
+        also-notify { 10.20.0.3; };
+    };
+    zone "aliada.internal" {
+        type primary; file "/var/lib/bind/interna/db.aliada.internal";
+    };
+    zone "0.20.10.in-addr.arpa" {
+        type primary; file "/var/lib/bind/interna/db.0.20.10";
+        allow-transfer { key "transferencia-nazareno"; };
+        also-notify { 10.20.0.3; };
+    };
+    // La zona publica vista desde adentro: mismos nombres, IP privadas
+    zone "nazareno.example" {
+        type primary; file "/var/lib/bind/interna/db.nazareno.example";
+        allow-transfer { key "transferencia-nazareno"; };
+        also-notify { 10.20.0.3; };
+    };
+    // DNS dinamico: los equipos registran su IP con nsupdate firmado con TSIG (solo A y TXT, solo esta zona)
+    zone "dinamica.nazareno.internal" {
+        type primary; file "/var/lib/bind/dinamica/db.dinamica.nazareno.internal";
+        update-policy { grant dinamico-nazareno zonesub A TXT; };
+        allow-transfer { key "transferencia-nazareno"; };
+        also-notify { 10.20.0.3; };
+    };
+};
+
+// Vista EXTERNA: internet solo ve la zona publica, firmada con DNSSEC; la genera DNSControl
+view "externa" {
+    match-clients { any; };
+    zone "nazareno.example" {
+        type primary; file "/var/lib/bind/externa/db.nazareno.example";
+        dnssec-policy "nazareno";
+        inline-signing yes;   // mantiene la zona sin firmar y genera aparte la copia firmada
+    };
+};

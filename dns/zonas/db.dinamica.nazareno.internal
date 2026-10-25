@@ -1,0 +1,5 @@
+; Subzona de DNS dinamico: los equipos se registran con nsupdate (clave TSIG "dinamico-nazareno").
+$TTL 300
+@   IN SOA ns1.nazareno.internal. ti.nazareno.internal. ( 2026102501 3600 900 1209600 300 )
+    IN NS  ns1.nazareno.internal.
+    IN NS  ns2.nazareno.internal.

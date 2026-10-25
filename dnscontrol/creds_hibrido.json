@@ -1,0 +1,5 @@
+{
+  "bind":       { "TYPE": "BIND", "directory": "zonas" },
+  "gestionado": { "TYPE": "CLOUDFLAREAPI", "apitoken": "$CF_API_TOKEN" },
+  "none":       { "TYPE": "NONE" }
+}

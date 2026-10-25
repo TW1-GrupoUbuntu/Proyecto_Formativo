@@ -1,0 +1,12 @@
+# OpenDMARC de __DOM__: evalua la politica DMARC del dominio del remitente (alineacion SPF/DKIM)
+AuthservID              mail.__DOM__
+TrustedAuthservIDs      mail.__DOM__
+Socket                  inet:8893@127.0.0.1
+PidFile                 /run/opendmarc/opendmarc.pid
+UserID                  opendmarc
+UMask                   007
+Syslog                  true
+RejectFailures          false
+IgnoreAuthenticatedClients true
+SPFIgnoreResults        false
+SPFSelfValidate         false

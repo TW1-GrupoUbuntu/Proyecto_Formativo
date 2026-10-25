@@ -1,0 +1,9 @@
+; Organizacion aliada (segundo dominio de correo, para probar el envio entre dominios y la verificacion en el destino).
+$TTL 3600
+@   IN SOA ns1.nazareno.internal. ti.aliada.internal. ( 2026102501 3600 900 1209600 300 )
+    IN NS  ns1.nazareno.internal.
+mail    IN A 10.20.0.26
+@       IN MX 10 mail.aliada.internal.
+@       IN TXT "v=spf1 mx -all"
+_dmarc  IN TXT "v=DMARC1; p=quarantine; rua=mailto:dmarc@aliada.internal; adkim=s; aspf=s"
+$INCLUDE /var/lib/bind/interna/dkim.aliada.internal.inc

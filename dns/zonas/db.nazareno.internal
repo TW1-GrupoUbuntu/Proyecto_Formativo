@@ -1,0 +1,25 @@
+; Zona interna de la Cooperativa Jesus Nazareno (laboratorio). Subir el serial en CADA cambio (scripts/subir_serial.sh).
+$TTL 3600
+@   IN SOA ns1.nazareno.internal. ti.nazareno.internal. ( 2026102501 3600 900 1209600 300 )
+    IN NS  ns1.nazareno.internal.
+    IN NS  ns2.nazareno.internal.
+ns1         IN A 10.20.0.2
+ns2         IN A 10.20.0.3
+resolutor   IN A 10.20.0.4
+www         IN A 10.20.0.20
+portal      IN CNAME www
+mail        IN A 10.20.0.25
+cliente     IN A 10.20.0.50
+; Servicios internos de la oficina (impresoras, contabilidad, camaras, archivos)
+impresora    IN A 10.20.0.101
+contabilidad IN A 10.20.0.102
+camaras      IN A 10.20.0.103
+archivos     IN A 10.20.0.104
+; Correo: MX, SPF, DMARC y CAA (la clave publica DKIM la inserta scripts/publicar_dkim.sh)
+@       IN MX 10 mail.nazareno.internal.
+@       IN TXT "v=spf1 mx -all"
+_dmarc  IN TXT "v=DMARC1; p=quarantine; rua=mailto:dmarc@nazareno.internal; adkim=s; aspf=s"
+@       IN CAA 0 issue "pki.nazareno.internal"
+_imaps._tcp       IN SRV 0 1 993 mail.nazareno.internal.
+_submission._tcp  IN SRV 0 1 587 mail.nazareno.internal.
+$INCLUDE /var/lib/bind/interna/dkim.nazareno.internal.inc

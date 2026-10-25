@@ -1,0 +1,17 @@
+// named.conf de ns2 (secundario): copia las zonas internas de ns1 autenticado con TSIG; sin recursion.
+options {
+    directory "/var/cache/bind";
+    listen-on { any; };
+    listen-on-v6 { none; };
+    recursion no;
+    allow-query { 10.20.0.0/24; 127.0.0.0/8; };
+    allow-transfer { none; };
+    dnssec-validation no;
+    version "no disponible";
+};
+include "/etc/bind/claves.conf";
+server 10.20.0.2 { keys "transferencia-nazareno"; };
+zone "nazareno.internal"           { type secondary; primaries { 10.20.0.2; }; file "/var/cache/bind/db.nazareno.internal"; };
+zone "0.20.10.in-addr.arpa"        { type secondary; primaries { 10.20.0.2; }; file "/var/cache/bind/db.0.20.10"; };
+zone "nazareno.example"            { type secondary; primaries { 10.20.0.2; }; file "/var/cache/bind/db.nazareno.example"; };
+zone "dinamica.nazareno.internal"  { type secondary; primaries { 10.20.0.2; }; file "/var/cache/bind/db.dinamica.nazareno.internal"; };

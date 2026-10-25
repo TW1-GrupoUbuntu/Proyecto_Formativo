@@ -1,0 +1,18 @@
+# OpenDKIM de __DOM__: firma el correo saliente (clave privada local) y verifica el entrante
+Syslog              yes
+SyslogSuccess       yes
+LogWhy              yes
+Canonicalization    relaxed/simple
+Mode                sv
+OversignHeaders     From
+SignatureAlgorithm  rsa-sha256
+UserID              opendkim
+UMask               007
+PidFile             /run/opendkim/opendkim.pid
+Socket              inet:8891@127.0.0.1
+KeyTable            /etc/opendkim/KeyTable
+SigningTable        refile:/etc/opendkim/SigningTable
+# Solo el propio servidor es "interno"; el correo de usuarios autenticados se firma por la macro {auth_authen}
+InternalHosts       127.0.0.1
+# Consultas DNS directas a ns1: el DNS embebido de Docker (127.0.0.11) no sirve para que OpenDKIM encuentre la clave publica
+Nameservers         10.20.0.4

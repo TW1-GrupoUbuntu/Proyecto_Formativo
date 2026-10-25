@@ -1,0 +1,15 @@
+
+# --- Actividad 4 ---
+# SPF: consulta de politica (cabecera Received-SPF)
+policyd-spf unix - n n - 0 spawn user=policyd-spf argv=/usr/bin/policyd-spf
+# Submission (587): TLS obligatorio, autenticacion obligatoria y remitente = usuario autenticado
+submission inet n - y - - smtpd
+  -o syslog_name=postfix/submission
+  -o smtpd_tls_security_level=encrypt
+  -o smtpd_tls_auth_only=yes
+  -o smtpd_sasl_auth_enable=yes
+  -o smtpd_client_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_sender_login_maps=regexp:/etc/postfix/login_maps
+  -o smtpd_sender_restrictions=reject_sender_login_mismatch
+  -o smtpd_relay_restrictions=permit_sasl_authenticated,reject
+  -o smtpd_recipient_restrictions=permit_sasl_authenticated,reject
