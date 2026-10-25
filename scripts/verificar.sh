@@ -19,7 +19,7 @@ AP=$(e "bash /lab/auditoria/auditar_publico.sh nazareno.example 172.31.0.2 /comp
 BP=$(echo "$AP" | grep -oE '[0-9]+ de [0-9]+' | head -n 1)
 prueba "Auditoria publica al 100 % ($BP)" test "${BP%% de *}" = "${BP##* de }"
 
-docker cp pf-cliente:/tmp/INFORME_AUDITORIA.md docs/INFORME_AUDITORIA.md 2>/dev/null
+docker exec pf-cliente cat /tmp/INFORME_AUDITORIA.md > docs/INFORME_AUDITORIA.md 2>/dev/null   # /tmp es tmpfs: docker cp no puede leerlo
 seccion "DNS: vistas, secundario, TSIG y DNSSEC"
 prueba "Vista interna: www.nazareno.example = 10.20.0.20" c "[ \"\$(dig +short @10.20.0.2 www.nazareno.example)\" = 10.20.0.20 ]"
 prueba "Vista externa: www.nazareno.example = 203.0.113.20" e "[ \"\$(dig +short @172.31.0.2 www.nazareno.example)\" = 203.0.113.20 ]"
